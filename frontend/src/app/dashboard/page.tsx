@@ -17,7 +17,7 @@ export default function DashboardPage() {
     try {
 
       const res = await axios.get(
-        "http://localhost:5000/dashboard"
+        `${process.env.NEXT_PUBLIC_API_URL}/dashboard`
       );
 
       setDashboard(res.data);
