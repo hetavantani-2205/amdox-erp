@@ -146,7 +146,7 @@ export default function PayrollPage() {
 
             </thead>
 
-           <tbody>
+     <tbody>
 
   {Array.isArray(payrolls) &&
     payrolls.map((payroll: any) => (
@@ -160,11 +160,41 @@ export default function PayrollPage() {
           {payroll.employee?.name}
         </td>
 
+        <td className="p-4">
+          {payroll.employee?.email}
+        </td>
+
+        <td className="p-4">
+          {payroll.month}
+        </td>
+
+        <td className="p-4">
+          ₹{payroll.basicSalary}
+        </td>
+
+        <td className="p-4">
+          ₹{payroll.bonus}
+        </td>
+
+        <td className="p-4 font-semibold text-green-600">
+          ₹{payroll.netSalary}
+        </td>
+
+        <td
+          className={`p-4 font-bold ${
+            payroll.status === "Paid"
+              ? "text-green-600"
+              : "text-orange-500"
+          }`}
+        >
+          {payroll.status}
+        </td>
+
       </tr>
 
     ))}
 
-     </tbody>
+</tbody>
 
           </table>
 
