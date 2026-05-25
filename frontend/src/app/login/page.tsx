@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/dist/client/link';
 
 export default function LoginPage() {
 
@@ -186,6 +187,19 @@ export default function LoginPage() {
         >
           Login
         </button>
+
+        <p className="mt-5 text-center">
+
+  Don&apos;t have an account?
+
+  <Link
+    href="/register"
+    className="text-blue-600 ml-2"
+  >
+    Register
+  </Link>
+
+</p>
 
       </div>
 
