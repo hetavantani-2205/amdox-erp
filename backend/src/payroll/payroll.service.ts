@@ -6,42 +6,52 @@ export class PayrollService {
   constructor(private prisma: PrismaService) {}
 
   async generatePayroll() {
-    const employees = await this.prisma.user.findMany();
 
-    for (const employee of employees) {
-      const basicSalary = employee.salary || 0;
+  const employees = await this.prisma.user.findMany();
 
-      const hra = basicSalary * 0.2;
-      const bonus = 5000;
-      const deduction = basicSalary * 0.12;
+  for (const employee of employees) {
 
-      const netSalary =
-        basicSalary + hra + bonus - deduction;
 
-      await this.prisma.payroll.create({
-        data: {
+    const existingPayroll =
+      await this.prisma.payroll.findFirst({
+        where: {
           employeeId: employee.id,
           month: 'May 2026',
-          basicSalary,
-          hra,
-          bonus,
-          deduction,
-          netSalary,
-          status: 'Paid',
         },
       });
+
+    if (existingPayroll) {
+      continue;
     }
 
-    return {
-      message: 'Payroll generated successfully',
-    };
-  }
 
-  async getPayrolls() {
-    return this.prisma.payroll.findMany({
-      include: {
-        employee: true,
+    const basicSalary = employee.salary || 50000;
+
+    const hra = basicSalary * 0.2;
+    const bonus = 5000;
+    const deduction = basicSalary * 0.12;
+
+    const netSalary =
+      basicSalary + hra + bonus - deduction;
+
+    await this.prisma.payroll.create({
+      data: {
+        employeeId: employee.id,
+        month: 'May 2026',
+        basicSalary,
+        hra,
+        bonus,
+        deduction,
+        netSalary,
+        status: 'Paid',
       },
     });
   }
+
+  return {
+    message: 'Payroll generated successfully',
+  };
+
+}
+
 }
