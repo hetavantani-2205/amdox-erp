@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 
 import { EmployeesModule } from './employees/employees.module';
 import { EmployeeModule } from './employee/employee.module';
+import { PayrollModule } from './payroll/payroll.module';
 
 import { ProjectsModule } from './projects/projects.module';
 
@@ -17,6 +18,7 @@ import { PrismaService } from './prisma/prisma.service';
     EmployeesModule,
     EmployeeModule,
     ProjectsModule,
+    PayrollModule,
   ],
 
   controllers: [AppController],
