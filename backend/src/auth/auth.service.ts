@@ -14,115 +14,141 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 
-  async register(data: RegisterDto) {
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email: data.email,
-      },
-    });
+  
+
+  async register(dto: RegisterDto) {
+
+    
+    const existingUser =
+      await this.prisma.user.findUnique({
+        where: {
+          email: dto.email,
+        },
+      });
 
     if (existingUser) {
-      throw new BadRequestException('Email already exists');
+
+      throw new BadRequestException(
+        'Email already exists',
+      );
+
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    // HASH PASSWORD
+    const hashedPassword =
+      await bcrypt.hash(dto.password, 10);
 
-    const tenant = await this.prisma.tenant.create({
-      data: {
-        name: data.tenantName,
-      },
-    });
+    // CREATE DEFAULT TENANT
+    const tenant =
+      await this.prisma.tenant.create({
+        data: {
+          name: `${dto.name} Company`,
+        },
+      });
 
-    const user = await this.prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        password: hashedPassword,
-        tenantId: tenant.id,
-        role: 'TENANT_ADMIN',
-      },
-    });
+    // CREATE USER
+    const user =
+      await this.prisma.user.create({
+        data: {
+          name: dto.name,
+          email: dto.email,
+          password: hashedPassword,
+          role: dto.role,
+          salary: 50000,
+          tenantId: tenant.id,
+        },
+      });
 
     return {
+
       message: 'User registered successfully',
+
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
-        tenantId: user.tenantId,
-        createdAt: user.createdAt,
+        salary: user.salary,
       },
+
     };
   }
 
- async login(data: LoginDto) {
+  // ================= LOGIN =================
 
-  const user = await this.prisma.user.findUnique({
-    where: {
-      email: data.email,
-    },
-  });
+  async login(data: LoginDto) {
 
-  // CHECK USER
-  if (!user) {
+    const user =
+      await this.prisma.user.findUnique({
+        where: {
+          email: data.email,
+        },
+      });
 
-    throw new UnauthorizedException(
-      'Invalid credentials',
-    );
+    // CHECK USER
+    if (!user) {
 
-  }
+      throw new UnauthorizedException(
+        'Invalid credentials',
+      );
 
-  // CHECK PASSWORD
-  const passwordMatch =
-    await bcrypt.compare(
-      data.password,
-      user.password,
-    );
+    }
 
-  if (!passwordMatch) {
+    // CHECK PASSWORD
+    const passwordMatch =
+      await bcrypt.compare(
+        data.password,
+        user.password,
+      );
 
-    throw new UnauthorizedException(
-      'Invalid credentials',
-    );
+    if (!passwordMatch) {
 
-  }
+      throw new UnauthorizedException(
+        'Invalid credentials',
+      );
 
-  // ROLE CHECK
-  if (user.role !== data.role) {
+    }
 
-    throw new UnauthorizedException(
-      'Invalid role selected',
-    );
+    // CHECK ROLE
+    if (user.role !== data.role) {
 
-  }
+      throw new UnauthorizedException(
+        'Invalid role selected',
+      );
 
-  // GENERATE JWT TOKEN
-  const token = this.jwtService.sign({
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-    tenantId: user.tenantId,
-  });
+    }
 
-  return {
+    // GENERATE JWT TOKEN
+    const token =
+      this.jwtService.sign({
 
-    message: 'Login successful',
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenantId,
 
-    access_token: token,
+      });
 
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    },
+    return {
 
-  };
+      message: 'Login successful',
+
+      access_token: token,
+
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        salary: user.salary,
+      },
+
+    };
   }
 }

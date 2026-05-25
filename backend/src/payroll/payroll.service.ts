@@ -54,4 +54,14 @@ export class PayrollService {
 
 }
 
+async getPayrolls() {
+
+  return this.prisma.payroll.findMany({
+    include: {
+      employee: true,
+    },
+  });
+
+}
+
 }
