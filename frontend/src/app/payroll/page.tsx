@@ -1,6 +1,46 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function PayrollPage() {
+
+  const [payrolls, setPayrolls] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPayroll();
+  }, []);
+
+  const fetchPayroll = async () => {
+    try {
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/payroll`
+      );
+
+      const data = await response.json();
+
+      setPayrolls(data);
+
+    } catch (error) {
+
+      console.error("Payroll Fetch Error:", error);
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="p-10 text-2xl font-bold">
+        Loading Payroll...
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-100">
 
@@ -51,11 +91,22 @@ export default function PayrollPage() {
       {/* Main Content */}
       <div className="flex-1 p-10">
 
-        <h1 className="text-4xl font-bold mb-8">
-          Payroll Management
-        </h1>
+        <div className="flex justify-between items-center mb-8">
 
-        <div className="bg-white rounded-2xl shadow-md p-6">
+          <h1 className="text-4xl font-bold">
+            Payroll Management
+          </h1>
+
+          <button
+            onClick={fetchPayroll}
+            className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+          >
+            Refresh Payroll
+          </button>
+
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-md p-6 overflow-x-auto">
 
           <table className="w-full">
 
@@ -68,11 +119,23 @@ export default function PayrollPage() {
                 </th>
 
                 <th className="text-left p-4">
-                  Department
+                  Email
+                </th>
+
+                <th className="text-left p-4">
+                  Month
                 </th>
 
                 <th className="text-left p-4">
                   Salary
+                </th>
+
+                <th className="text-left p-4">
+                  Bonus
+                </th>
+
+                <th className="text-left p-4">
+                  Net Salary
                 </th>
 
                 <th className="text-left p-4">
@@ -85,32 +148,50 @@ export default function PayrollPage() {
 
             <tbody>
 
-              <tr className="border-b">
-                <td className="p-4">Rahul Sharma</td>
-                <td className="p-4">IT</td>
-                <td className="p-4">₹50,000</td>
-                <td className="p-4 text-green-600 font-bold">
-                  Paid
-                </td>
-              </tr>
+              {payrolls.map((payroll: any) => (
 
-              <tr className="border-b">
-                <td className="p-4">Priya Patel</td>
-                <td className="p-4">HR</td>
-                <td className="p-4">₹45,000</td>
-                <td className="p-4 text-orange-500 font-bold">
-                  Pending
-                </td>
-              </tr>
+                <tr
+                  key={payroll.id}
+                  className="border-b hover:bg-gray-50"
+                >
 
-              <tr className="border-b">
-                <td className="p-4">Amit Shah</td>
-                <td className="p-4">Finance</td>
-                <td className="p-4">₹60,000</td>
-                <td className="p-4 text-green-600 font-bold">
-                  Paid
-                </td>
-              </tr>
+                  <td className="p-4 font-semibold">
+                    {payroll.employee?.name}
+                  </td>
+
+                  <td className="p-4">
+                    {payroll.employee?.email}
+                  </td>
+
+                  <td className="p-4">
+                    {payroll.month}
+                  </td>
+
+                  <td className="p-4">
+                    ₹{payroll.basicSalary}
+                  </td>
+
+                  <td className="p-4 text-blue-600 font-semibold">
+                    ₹{payroll.bonus}
+                  </td>
+
+                  <td className="p-4 font-bold">
+                    ₹{payroll.netSalary}
+                  </td>
+
+                  <td
+                    className={`p-4 font-bold ${
+                      payroll.status === "Paid"
+                        ? "text-green-600"
+                        : "text-orange-500"
+                    }`}
+                  >
+                    {payroll.status}
+                  </td>
+
+                </tr>
+
+              ))}
 
             </tbody>
 
