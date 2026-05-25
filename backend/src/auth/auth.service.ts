@@ -52,7 +52,9 @@ export class AuthService {
         },
       });
 
-    // CREATE USER
+  
+
+    
     const user =
       await this.prisma.user.create({
         data: {
@@ -64,6 +66,17 @@ export class AuthService {
           tenantId: tenant.id,
         },
       });
+
+      const basicSalary = user.salary || 0;
+
+  const hra = basicSalary * 0.2;
+
+  const bonus = 5000;
+
+  const deduction = basicSalary * 0.12;
+
+  const netSalary =
+    basicSalary + hra + bonus - deduction;
 
     return {
 
