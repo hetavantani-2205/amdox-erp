@@ -41,178 +41,152 @@ export default function DashboardPage() {
     return <div>Loading...</div>;
   }
 
-  return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
+ return (
 
-      <div className="max-w-7xl mx-auto">
+  <div className="flex min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
 
-      <div className="flex justify-between items-center mb-10">
-
-  <div>
-
-    <h1 className="text-5xl font-bold tracking-tight">
-      ERP Dashboard
-    </h1>
-
-    <p className="text-gray-500 mt-2">
-      Welcome back to your enterprise workspace
-    </p>
-
-  </div>
-
-  <div className="flex items-center gap-5">
-
-    {/* NOTIFICATION */}
-    <div className="bg-white p-4 rounded-2xl shadow-md cursor-pointer hover:scale-105 transition">
-
-      <Bell />
-
-    </div>
-
-    {/* PROFILE */}
-    <div className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-md">
-
-      <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
-
-        H
-
-      </div>
+    {/* SIDEBAR */}
+    <div className="w-72 bg-[#0B1120] text-white p-6 flex flex-col justify-between shadow-2xl">
 
       <div>
 
-        <h2 className="font-bold">
-          Hetav Antani
-        </h2>
+        <h1 className="text-4xl font-bold mb-12 tracking-tight">
+          Amdox ERP
+        </h1>
 
-        <p className="text-sm text-gray-500">
-          Admin
-        </p>
+        <div className="space-y-3">
+
+          <Link href="/dashboard">
+            <div className="flex items-center gap-3 bg-blue-600 p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition">
+
+              <LayoutDashboard size={22} />
+
+              Dashboard
+
+            </div>
+          </Link>
+
+          <Link href="/employees">
+            <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
+
+              <Users size={22} />
+
+              Employees
+
+            </div>
+          </Link>
+
+          <Link href="/attendance">
+            <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
+
+              <CalendarCheck size={22} />
+
+              Attendance
+
+            </div>
+          </Link>
+
+          <Link href="/payroll">
+            <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
+
+              <IndianRupee size={22} />
+
+              Payroll
+
+            </div>
+          </Link>
+
+          <Link href="/settings">
+            <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
+
+              <Settings size={22} />
+
+              Settings
+
+            </div>
+          </Link>
+
+        </div>
 
       </div>
 
-    </div>
+      {/* LOGOUT */}
+      <button
+        onClick={() => {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        }}
+        className="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 p-4 rounded-2xl transition"
+      >
 
-  </div>
+        <LogOut size={20} />
 
-</div>
+        Logout
 
-      {/* SIDEBAR */}
-<div className="w-72 bg-[#0B1120] text-white p-6 flex flex-col justify-between shadow-2xl">
-
-  <div>
-
-    <h1 className="text-4xl font-bold mb-12 tracking-tight">
-      Amdox ERP
-    </h1>
-
-    <div className="space-y-3">
-
-      <Link href="/dashboard">
-        <div className="flex items-center gap-3 bg-blue-600 p-4 rounded-2xl cursor-pointer hover:scale-[1.02] transition">
-
-          <LayoutDashboard size={22} />
-
-          Dashboard
-
-        </div>
-      </Link>
-
-      <Link href="/employees">
-        <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
-
-          <Users size={22} />
-
-          Employees
-
-        </div>
-      </Link>
-
-      <Link href="/attendance">
-        <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
-
-          <CalendarCheck size={22} />
-
-          Attendance
-
-        </div>
-      </Link>
-
-      <Link href="/payroll">
-        <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
-
-          <IndianRupee size={22} />
-
-          Payroll
-
-        </div>
-      </Link>
-
-      <Link href="/settings">
-        <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
-
-          <Settings size={22} />
-
-          Settings
-
-        </div>
-      </Link>
+      </button>
 
     </div>
 
-  </div>
+    {/* MAIN CONTENT */}
+    <div className="flex-1 p-8 overflow-x-hidden">
 
-  {/* LOGOUT */}
-  <button
-    onClick={() => {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }}
-    className="flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 p-4 rounded-2xl transition"
-  >
+      <div className="max-w-7xl mx-auto">
 
-    <LogOut size={20} />
-
-    Logout
-
-  </button>
-
-</div>
-
-
-      {/* Main */}
-      <div className="flex-1 p-8 overflow-x-hidden">
-
-        {/* Header */}
+        {/* TOP NAVBAR */}
         <div className="flex justify-between items-center mb-10">
 
           <div>
 
-            <h1 className="text-5xl font-bold mb-2">
+            <h1 className="text-5xl font-bold tracking-tight">
               ERP Dashboard
             </h1>
 
-            <p className="text-gray-500">
-              Welcome to enterprise management panel
+            <p className="text-gray-500 mt-2">
+              Welcome back to your enterprise workspace
             </p>
 
           </div>
 
-          <div className="bg-white px-6 py-4 rounded-2xl shadow-md">
-            <p className="text-gray-500 text-sm">
-              Active Users
-            </p>
+          <div className="flex items-center gap-5">
 
-            <h2 className="text-3xl font-bold">
-              {dashboard.employees}
-            </h2>
+            {/* NOTIFICATION */}
+            <div className="bg-white p-4 rounded-2xl shadow-md cursor-pointer hover:scale-105 transition">
+
+              <Bell />
+
+            </div>
+
+            {/* PROFILE */}
+            <div className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-md">
+
+              <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+
+                H
+
+              </div>
+
+              <div>
+
+                <h2 className="font-bold">
+                  Hetav Antani
+                </h2>
+
+                <p className="text-sm text-gray-500">
+                  Admin
+                </p>
+
+              </div>
+
+            </div>
+
           </div>
 
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-4 gap-6 mb-10">
+        {/* KPI CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
 
-          <div className="bg-gradient-to-r from-blue-600 to-blue-400 text-white p-6 rounded-3xl shadow-lg">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-400 text-white p-6 rounded-3xl shadow-xl hover:scale-[1.02] transition duration-300">
 
             <p className="text-lg">
               Employees
@@ -224,7 +198,7 @@ export default function DashboardPage() {
 
           </div>
 
-          <div className="bg-gradient-to-r from-green-600 to-green-400 text-white p-6 rounded-3xl shadow-lg">
+          <div className="bg-gradient-to-r from-green-600 to-green-400 text-white p-6 rounded-3xl shadow-xl hover:scale-[1.02] transition duration-300">
 
             <p className="text-lg">
               Projects
@@ -236,7 +210,7 @@ export default function DashboardPage() {
 
           </div>
 
-          <div className="bg-gradient-to-r from-purple-600 to-pink-500 text-white p-6 rounded-3xl shadow-lg">
+          <div className="bg-gradient-to-r from-purple-600 to-pink-500 text-white p-6 rounded-3xl shadow-xl hover:scale-[1.02] transition duration-300">
 
             <p className="text-lg">
               Attendance
@@ -248,7 +222,7 @@ export default function DashboardPage() {
 
           </div>
 
-          <div className="bg-gradient-to-r from-orange-500 to-yellow-400 text-white p-6 rounded-3xl shadow-lg">
+          <div className="bg-gradient-to-r from-orange-500 to-yellow-400 text-white p-6 rounded-3xl shadow-xl hover:scale-[1.02] transition duration-300">
 
             <p className="text-lg">
               Payroll
@@ -262,8 +236,8 @@ export default function DashboardPage() {
 
         </div>
 
-        {/* Recent Employees */}
-        <div className="bg-white rounded-3xl shadow-lg p-8 overflow-x-auto">
+        {/* RECENT EMPLOYEES */}
+        <div className="bg-white rounded-3xl shadow-xl p-8 overflow-x-auto">
 
           <div className="flex justify-between mb-6">
 
@@ -271,8 +245,10 @@ export default function DashboardPage() {
               Recent Employees
             </h2>
 
-            <button className="bg-blue-600 text-white px-5 py-2 rounded-3xl shadow-xl hover:scale-[1.02] transition duration-300">
+            <button className="bg-blue-600 text-white px-5 py-2 rounded-2xl hover:bg-blue-700 transition">
+
               View All
+
             </button>
 
           </div>
@@ -310,7 +286,7 @@ export default function DashboardPage() {
 
                   <tr
                     key={employee.id}
-                    className="border-b hover:bg-gray-50"
+                    className="border-b hover:bg-gray-50 transition"
                   >
 
                     <td className="p-4 font-semibold">
@@ -342,8 +318,9 @@ export default function DashboardPage() {
 
       </div>
 
-      </div>
-
     </div>
-  );
+
+  </div>
+
+);
 }
