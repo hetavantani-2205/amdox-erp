@@ -23,20 +23,20 @@ model Tenant {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  password    String
-  role        UserRole @default(EMPLOYEE)
-
+  id       String   @id @default(cuid())
+  name     String
+  email    String   @unique
+  password String
+  role     UserRole @default(EMPLOYEE)
 
   designation String?
   salary      Float?
+  payrolls    Payroll[]
 
-  tenantId    String
-  tenant      Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Employee {
@@ -56,4 +56,19 @@ model Project {
   description String
   status      String
   createdAt   DateTime @default(now())
+}
+
+model Payroll {
+  id          String   @id @default(cuid())
+  employeeId  String
+  month       String
+  basicSalary Float
+  hra         Float
+  bonus       Float
+  deduction   Float
+  netSalary   Float
+  status      String
+  createdAt   DateTime @default(now())
+
+  employee User @relation(fields: [employeeId], references: [id])
 }
