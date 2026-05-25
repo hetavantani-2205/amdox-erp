@@ -21,7 +21,7 @@ export default function PayrollPage() {
 
       const data = await response.json();
 
-      setPayrolls(data);
+      setPayrolls(Array.isArray(data) ? data : []);
 
     } catch (error) {
 
@@ -146,54 +146,25 @@ export default function PayrollPage() {
 
             </thead>
 
-            <tbody>
+           <tbody>
 
-              {payrolls.map((payroll: any) => (
+  {Array.isArray(payrolls) &&
+    payrolls.map((payroll: any) => (
 
-                <tr
-                  key={payroll.id}
-                  className="border-b hover:bg-gray-50"
-                >
+      <tr
+        key={payroll.id}
+        className="border-b hover:bg-gray-50"
+      >
 
-                  <td className="p-4 font-semibold">
-                    {payroll.employee?.name}
-                  </td>
+        <td className="p-4 font-semibold">
+          {payroll.employee?.name}
+        </td>
 
-                  <td className="p-4">
-                    {payroll.employee?.email}
-                  </td>
+      </tr>
 
-                  <td className="p-4">
-                    {payroll.month}
-                  </td>
+    ))}
 
-                  <td className="p-4">
-                    ₹{payroll.basicSalary}
-                  </td>
-
-                  <td className="p-4 text-blue-600 font-semibold">
-                    ₹{payroll.bonus}
-                  </td>
-
-                  <td className="p-4 font-bold">
-                    ₹{payroll.netSalary}
-                  </td>
-
-                  <td
-                    className={`p-4 font-bold ${
-                      payroll.status === "Paid"
-                        ? "text-green-600"
-                        : "text-orange-500"
-                    }`}
-                  >
-                    {payroll.status}
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
+     </tbody>
 
           </table>
 
