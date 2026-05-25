@@ -44,6 +44,8 @@ export default function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
 
+      <div className="max-w-7xl mx-auto">
+
       <div className="flex justify-between items-center mb-10">
 
   <div>
@@ -178,7 +180,7 @@ export default function DashboardPage() {
 
 
       {/* Main */}
-      <div className="flex-1 p-10">
+      <div className="flex-1 p-8 overflow-x-hidden">
 
         {/* Header */}
         <div className="flex justify-between items-center mb-10">
@@ -261,7 +263,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent Employees */}
-        <div className="bg-white rounded-3xl shadow-lg p-8">
+        <div className="bg-white rounded-3xl shadow-lg p-8 overflow-x-auto">
 
           <div className="flex justify-between mb-6">
 
@@ -337,6 +339,8 @@ export default function DashboardPage() {
           </table>
 
         </div>
+
+      </div>
 
       </div>
 
