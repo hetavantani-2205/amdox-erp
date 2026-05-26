@@ -1,13 +1,32 @@
 import './globals.css';
 
+import { Toaster } from 'react-hot-toast';
+
+export const metadata = {
+  title: 'Amdox ERP',
+  description: 'AI Powered ERP System',
+  manifest: '/manifest.json',
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
   return (
+
     <html lang="en">
-      <body>{children}</body>
+
+      <body>
+
+        {children}
+
+        <Toaster position="top-right" />
+
+      </body>
+
     </html>
+
   );
 }

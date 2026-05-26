@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import Link from "next/link";
+import toast from 'react-hot-toast';
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -20,6 +21,30 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchDashboard();
+
+    setTimeout(() => {
+
+  toast.success(
+    'New employee joined successfully'
+  );
+
+}, 3000);
+
+setTimeout(() => {
+
+  toast(
+    'Payroll generated successfully'
+  );
+
+}, 6000);
+
+setTimeout(() => {
+
+  toast.error(
+    'Project deadline approaching'
+  );
+
+}, 9000);
   }, []);
 
   const fetchDashboard = async () => {
