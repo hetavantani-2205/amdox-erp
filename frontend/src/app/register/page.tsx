@@ -58,75 +58,170 @@ export default function RegisterPage() {
 
   return (
 
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+  <div
+    className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
+    style={{
+      backgroundImage: "url('/amdox-erp.png')",
+    }}
+  >
 
-      <div className="bg-white shadow-xl rounded-2xl p-10 w-[400px]">
+    {/* DARK OVERLAY */}
 
-        <h1 className="text-3xl font-bold text-center mb-8">
-          ERP Register
-        </h1>
+    <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border p-3 rounded-lg mb-4"
-        />
+    {/* Registration CARD */}
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border p-3 rounded-lg mb-4"
-        />
+    <div
+      className="
+        relative z-10
+        w-[400px]
+        bg-white/90
+        backdrop-blur-xl
+        rounded-3xl
+        shadow-2xl
+        border border-white/30
+        p-10
+      "
+    >
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border p-3 rounded-lg mb-4"
-        />
+      {/* HEADING */}
 
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          className="w-full border p-3 rounded-lg mb-6"
+      <h1
+        className="
+          text-4xl
+          font-bold
+          text-center
+          mb-8
+          text-slate-900
+        "
+      >
+        ERP Registration
+      </h1>
+
+      {/* EMAIL */}
+
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) =>
+          setEmail(e.target.value)
+        }
+        className="
+          w-full
+          p-4
+          mb-4
+          rounded-xl
+          border
+          border-gray-300
+          outline-none
+          focus:ring-2
+          focus:ring-blue-500
+        "
+      />
+
+      {/* PASSWORD */}
+
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) =>
+          setPassword(e.target.value)
+        }
+        className="
+          w-full
+          p-4
+          mb-4
+          rounded-xl
+          border
+          border-gray-300
+          outline-none
+          focus:ring-2
+          focus:ring-blue-500
+        "
+      />
+
+      {/* ROLE */}
+
+      <select
+        value={role}
+        onChange={(e) =>
+          setRole(e.target.value)
+        }
+        className="
+          w-full
+          p-4
+          mb-6
+          rounded-xl
+          border
+          border-gray-300
+          outline-none
+          focus:ring-2
+          focus:ring-blue-500
+        "
+      >
+
+        <option value="EMPLOYEE">
+          EMPLOYEE
+        </option>
+
+        <option value="MANAGER">
+          MANAGER
+        </option>
+
+        <option value="TENANT_ADMIN">
+          TENANT_ADMIN
+        </option>
+
+        <option value="SUPER_ADMIN">
+          SUPER_ADMIN
+        </option>
+
+      </select>
+
+      {/* REGISTER BUTTON */}
+
+      <button
+        onClick={handleRegister}
+        className="
+          w-full
+          bg-green-600
+          hover:bg-green-700
+          transition
+          duration-300
+          text-white
+          font-semibold
+          p-4
+          rounded-xl
+          shadow-lg
+        "
+      >
+        Register
+      </button>
+
+      {/* REGISTER LINK */}
+
+      <p className="mt-6 text-center text-gray-700">
+
+        Already have an account?
+
+        <Link
+          href="/login"
+          className="
+            text-blue-600
+            ml-2
+            font-semibold
+            hover:underline
+          "
         >
+          Login
+        </Link>
 
-          <option value="EMPLOYEE">
-            Employee
-          </option>
+      </p>
 
-          <option value="ADMIN">
-            Admin
-          </option>
-
-        </select>
-
-        <button
-          onClick={handleRegister}
-          className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700"
-        >
-          Register
-        </button>
-
-        <p className="mt-5 text-center">
-
-          Already have account?
-
-          <Link
-            href="/login"
-            className="text-blue-600 ml-2"
-          >
-            Login
-          </Link>
-
-        </p>
-
-      </div>
     </div>
-  );
+
+  </div>
+);
 }
