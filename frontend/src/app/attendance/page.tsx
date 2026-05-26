@@ -22,7 +22,7 @@ import {
 
 import {
   getRole,
-} from "@/utils/role";
+} from "../../utils/role";
 
 export default function AttendancePage() {
 
