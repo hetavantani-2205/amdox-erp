@@ -9,6 +9,18 @@ import Peer from 'peerjs';
 
 import io from 'socket.io-client';
 
+import {
+  Mic,
+  MicOff,
+  Video,
+  VideoOff,
+  PhoneOff,
+  ArrowLeft,
+} from 'lucide-react';
+
+import { useRouter }
+from 'next/navigation';
+
 const socket = io(
   process.env.NEXT_PUBLIC_API_URL!
 );
@@ -21,15 +33,30 @@ export default function MeetingPage() {
   const userVideo =
     useRef<HTMLVideoElement>(null);
 
-  const peerRef = useRef<any>(null);
+  const peerRef =
+    useRef<any>(null);
 
-  const streamRef = useRef<any>(null);
+  const streamRef =
+    useRef<any>(null);
 
   const [roomId, setRoomId] =
     useState('');
 
   const [joined, setJoined] =
     useState(false);
+
+  const [micOn, setMicOn] =
+    useState(true);
+
+  const [cameraOn, setCameraOn] =
+    useState(true);
+
+  const [emoji, setEmoji] =
+    useState('');
+
+  const router = useRouter();
+
+  // JOIN MEETING
 
   const joinMeeting = async () => {
 
@@ -68,7 +95,29 @@ export default function MeetingPage() {
         const call =
           peer.call(userId, stream);
 
-        call.on('stream', (remoteStream) => {
+        call.on(
+          'stream',
+          (remoteStream) => {
+
+            if (userVideo.current) {
+
+              userVideo.current.srcObject =
+                remoteStream;
+
+            }
+
+          }
+        );
+      }
+    );
+
+    peer.on('call', (call) => {
+
+      call.answer(stream);
+
+      call.on(
+        'stream',
+        (remoteStream) => {
 
           if (userVideo.current) {
 
@@ -77,24 +126,8 @@ export default function MeetingPage() {
 
           }
 
-        });
-      }
-    );
-
-    peer.on('call', (call) => {
-
-      call.answer(stream);
-
-      call.on('stream', (remoteStream) => {
-
-        if (userVideo.current) {
-
-          userVideo.current.srcObject =
-            remoteStream;
-
         }
-
-      });
+      );
     });
 
     peerRef.current = peer;
@@ -102,11 +135,60 @@ export default function MeetingPage() {
     setJoined(true);
   };
 
+  // TOGGLE MIC
+
+  const toggleMic = () => {
+
+    const audioTrack =
+      streamRef.current
+        ?.getAudioTracks()[0];
+
+    if (audioTrack) {
+
+      audioTrack.enabled =
+        !audioTrack.enabled;
+
+      setMicOn(audioTrack.enabled);
+
+    }
+  };
+
+  // TOGGLE CAMERA
+
+  const toggleCamera = () => {
+
+    const videoTrack =
+      streamRef.current
+        ?.getVideoTracks()[0];
+
+    if (videoTrack) {
+
+      videoTrack.enabled =
+        !videoTrack.enabled;
+
+      setCameraOn(videoTrack.enabled);
+
+    }
+  };
+
+  // END CALL
+
+  const endCall = () => {
+
+    streamRef.current
+      ?.getTracks()
+      .forEach((track: any) =>
+        track.stop()
+      );
+
+    router.push('/dashboard');
+  };
+
   return (
 
-    <div className="min-h-screen bg-[#050816] overflow-hidden relative text-white">
+    <div className="min-h-screen bg-[#050816] text-white relative overflow-hidden">
 
-      {/* BACKGROUND EFFECTS */}
+      {/* BACKGROUND */}
 
       <div className="absolute top-[-200px] left-[-200px] w-[500px] h-[500px] bg-blue-500 opacity-20 rounded-full blur-3xl" />
 
@@ -122,13 +204,13 @@ export default function MeetingPage() {
 
           <div>
 
-            <h1 className="text-6xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
 
               ERP Live Meeting
 
             </h1>
 
-            <p className="text-slate-400 mt-3 text-lg">
+            <p className="text-slate-400 mt-3">
 
               Real-time enterprise collaboration
 
@@ -136,17 +218,24 @@ export default function MeetingPage() {
 
           </div>
 
-          <div className="bg-white/10 backdrop-blur-xl border border-white/10 px-6 py-3 rounded-2xl">
+          <button
+            onClick={() =>
+              router.push('/dashboard')
+            }
+            className="
+              bg-white/10
+              backdrop-blur-xl
+              border border-white/10
+              p-4
+              rounded-2xl
+              hover:bg-white/20
+              transition
+            "
+          >
 
-            <p className="text-sm text-slate-300">
-              Status
-            </p>
+            <ArrowLeft />
 
-            <h2 className="text-green-400 font-bold">
-              Live
-            </h2>
-
-          </div>
+          </button>
 
         </div>
 
@@ -154,7 +243,7 @@ export default function MeetingPage() {
 
         {!joined && (
 
-          <div className="max-w-xl bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 mb-10 shadow-2xl">
+          <div className="max-w-xl bg-white/10 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 mb-10">
 
             <h2 className="text-3xl font-bold mb-6">
 
@@ -178,8 +267,6 @@ export default function MeetingPage() {
                   p-4
                   rounded-2xl
                   outline-none
-                  text-white
-                  placeholder:text-slate-400
                 "
               />
 
@@ -193,8 +280,6 @@ export default function MeetingPage() {
                   to-cyan-400
                   hover:scale-105
                   transition
-                  font-semibold
-                  shadow-xl
                 "
               >
 
@@ -214,90 +299,170 @@ export default function MeetingPage() {
 
           {/* MY VIDEO */}
 
-          <div className="relative group">
+          <div className="bg-black/40 border border-white/10 rounded-3xl overflow-hidden">
 
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition" />
+            <div className="p-5 border-b border-white/10">
 
-            <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-
-              <div className="flex justify-between items-center p-5 border-b border-white/10">
-
-                <h2 className="font-semibold text-lg">
-
-                  Your Camera
-
-                </h2>
-
-                <div className="flex items-center gap-2">
-
-                  <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
-
-                  Live
-
-                </div>
-
-              </div>
-
-              <video
-                ref={myVideo}
-                autoPlay
-                muted
-                className="
-                  w-full
-                  h-[500px]
-                  object-cover
-                  bg-black
-                "
-              />
+              Your Camera
 
             </div>
+
+            <video
+              ref={myVideo}
+              autoPlay
+              muted
+              className="
+                w-full
+                h-[500px]
+                object-cover
+                bg-black
+              "
+            />
 
           </div>
 
           {/* REMOTE VIDEO */}
 
-          <div className="relative group">
+          <div className="bg-black/40 border border-white/10 rounded-3xl overflow-hidden">
 
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition" />
+            <div className="p-5 border-b border-white/10">
 
-            <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
-
-              <div className="flex justify-between items-center p-5 border-b border-white/10">
-
-                <h2 className="font-semibold text-lg">
-
-                  Team Member
-
-                </h2>
-
-                <div className="flex items-center gap-2">
-
-                  <div className="w-3 h-3 rounded-full bg-cyan-400 animate-pulse" />
-
-                  Connected
-
-                </div>
-
-              </div>
-
-              <video
-                ref={userVideo}
-                autoPlay
-                className="
-                  w-full
-                  h-[500px]
-                  object-cover
-                  bg-black
-                "
-              />
+              Team Member
 
             </div>
+
+            <video
+              ref={userVideo}
+              autoPlay
+              className="
+                w-full
+                h-[500px]
+                object-cover
+                bg-black
+              "
+            />
 
           </div>
 
         </div>
 
+        {/* EMOJI BAR */}
+
+        <div className="flex justify-center gap-5 mt-10">
+
+          {['🔥', '👏', '😂', '👍', '🎉', '❤️'].map(
+            (item) => (
+
+              <button
+                key={item}
+                onClick={() =>
+                  setEmoji(item)
+                }
+                className="
+                  text-4xl
+                  hover:scale-125
+                  transition
+                "
+              >
+
+                {item}
+
+              </button>
+
+            )
+          )}
+
+        </div>
+
+        {/* CONTROLS */}
+
+        <div className="flex justify-center gap-6 mt-10">
+
+          {/* MIC */}
+
+          <button
+            onClick={toggleMic}
+            className={`
+              p-5
+              rounded-full
+              transition
+              ${
+                micOn
+                  ? 'bg-white/10'
+                  : 'bg-red-500'
+              }
+            `}
+          >
+
+            {micOn
+              ? <Mic />
+              : <MicOff />}
+
+          </button>
+
+          {/* CAMERA */}
+
+          <button
+            onClick={toggleCamera}
+            className={`
+              p-5
+              rounded-full
+              transition
+              ${
+                cameraOn
+                  ? 'bg-white/10'
+                  : 'bg-red-500'
+              }
+            `}
+          >
+
+            {cameraOn
+              ? <Video />
+              : <VideoOff />}
+
+          </button>
+
+          {/* END */}
+
+          <button
+            onClick={endCall}
+            className="
+              p-5
+              rounded-full
+              bg-red-500
+              hover:bg-red-600
+              transition
+            "
+          >
+
+            <PhoneOff />
+
+          </button>
+
+        </div>
+
       </div>
+
+      {/* FLOATING EMOJI */}
+
+      {emoji && (
+
+        <div
+          className="
+            fixed
+            top-24
+            right-10
+            text-7xl
+            animate-bounce
+            z-50
+          "
+        >
+
+          {emoji}
+
+        </div>
+
+      )}
 
     </div>
   );
