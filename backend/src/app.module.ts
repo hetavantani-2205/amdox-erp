@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 
 import { AuthModule } from './auth/auth.module';
 
+import { MeetingModule }
+from './meeting/meeting.module';
+
 import { EmployeesModule } from './employees/employees.module';
 import { EmployeeModule } from './employee/employee.module';
 import { PayrollModule } from './payroll/payroll.module';
@@ -19,6 +22,7 @@ import { PrismaService } from './prisma/prisma.service';
     EmployeeModule,
     ProjectsModule,
     PayrollModule,
+    MeetingModule,
   ],
 
   controllers: [AppController],
