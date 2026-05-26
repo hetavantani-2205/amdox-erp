@@ -99,7 +99,7 @@ export default function DashboardPage() {
           <Link href="/meeting">
   <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
 
-    🎥 Meetings
+    🎥 Live Meeting
 
   </div>
 </Link>
