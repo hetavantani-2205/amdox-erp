@@ -79,7 +79,7 @@ return (
   <div
     className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
     style={{
-      backgroundImage: "url('/amdox-erp.jpg')",
+      backgroundImage: "url('/amdox-erp.png')",
     }}
   >
 
