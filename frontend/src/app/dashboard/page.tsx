@@ -12,7 +12,7 @@ import {
 
 import {
   getRole,
-} from "@/utils/role";
+} from "../../utils/role";
 
 import Link from "next/link";
 import toast from "react-hot-toast";

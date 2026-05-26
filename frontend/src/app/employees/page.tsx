@@ -25,7 +25,7 @@ import {
 
 import {
   getRole,
-} from "@/utils/role";
+} from "../../utils/role";
 
 interface Employee {
 
