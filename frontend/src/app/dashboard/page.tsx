@@ -24,6 +24,12 @@ export default function DashboardPage() {
   const [dashboard, setDashboard] =
     useState<any>(null);
 
+    const [name, setName] =
+  useState("");
+
+const [role, setRole] =
+  useState("");
+
   useEffect(() => {
 
     fetchDashboard();
@@ -51,6 +57,14 @@ export default function DashboardPage() {
       );
 
     }, 9000);
+
+    setName(
+  localStorage.getItem("name") || ""
+);
+
+setRole(
+  localStorage.getItem("role") || ""
+);
 
   }, []);
 
@@ -264,23 +278,34 @@ export default function DashboardPage() {
 
               <div className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-md">
 
-                <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
-
-                  H
-
-                </div>
+                <div
+  className="
+    w-12
+    h-12
+    rounded-full
+    bg-blue-600
+    text-white
+    flex
+    items-center
+    justify-center
+    font-bold
+    text-lg
+  "
+>
+  {name?.charAt(0).toUpperCase()}
+</div>
 
                 <div>
 
                   <h2 className="font-bold">
 
-                    Hetav Antani
+                    {name}
 
                   </h2>
 
                   <p className="text-sm text-gray-500">
 
-                    {getRole()}
+                    {role}
 
                   </p>
 

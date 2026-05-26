@@ -78,6 +78,16 @@ export default function LoginPage() {
           data.user.role
         );
 
+        localStorage.setItem(
+  'name',
+  data.user.name
+);
+
+localStorage.setItem(
+  'email',
+  data.user.email
+);
+
         alert('Login Successful');
 
         router.push('/dashboard');
