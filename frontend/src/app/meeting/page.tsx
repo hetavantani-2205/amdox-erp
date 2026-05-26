@@ -28,9 +28,9 @@ export default function MeetingPage() {
   const [joined, setJoined] =
     useState(false);
 
-  const peerRef = useRef<any>();
+ const peerRef = useRef<any>(null);
 
-  const streamRef = useRef<any>();
+const streamRef = useRef<any>(null);
 
   const joinMeeting = async () => {
 
@@ -49,12 +49,7 @@ export default function MeetingPage() {
 
     }
 
-    const peer =
-      new Peer(undefined, {
-        host: 'peerjs-server.herokuapp.com',
-        secure: true,
-        port: 443,
-      });
+    const peer = new Peer();
 
     peer.on('open', (id) => {
 
