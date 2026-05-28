@@ -24,19 +24,14 @@ export class PayrollService {
       continue;
     }
 
+const basicSalary = Number(employee.salary) || 50000;
 
-    const basicSalary =
-  employee.salary &&
-  employee.salary > 0
-    ? employee.salary
-    : 50000;
+const hra = basicSalary * 0.2;
+const bonus = 5000;
+const deduction = basicSalary * 0.12;
 
-    const hra = basicSalary * 0.2;
-    const bonus = 5000;
-    const deduction = basicSalary * 0.12;
-
-    const netSalary =
-      basicSalary + hra + bonus - deduction;
+const netSalary =
+  basicSalary + hra + bonus - deduction;
 
     await this.prisma.payroll.create({
       data: {
