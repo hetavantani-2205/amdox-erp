@@ -30,7 +30,7 @@ model User {
   role     UserRole @default(EMPLOYEE)
 
   designation String?
-  salary      Float?
+  salary      Float @default(50000)
   payrolls    Payroll[]
 
   tenantId String

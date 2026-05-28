@@ -25,7 +25,11 @@ export class PayrollService {
     }
 
 
-    const basicSalary = employee.salary || 50000;
+    const basicSalary =
+  employee.salary &&
+  employee.salary > 0
+    ? employee.salary
+    : 50000;
 
     const hra = basicSalary * 0.2;
     const bonus = 5000;
