@@ -30,7 +30,7 @@ model User {
   role     UserRole @default(EMPLOYEE)
 
   designation String?
-  salary      Float @default(50000)
+  salary      Int @default(50000)
   payrolls    Payroll[]
 
   tenantId String
@@ -45,7 +45,7 @@ model Employee {
   email       String   @unique
   department  String
   designation String
-  salary      Float
+  salary      Int
   attendance  String
   createdAt   DateTime @default(now())
 }
