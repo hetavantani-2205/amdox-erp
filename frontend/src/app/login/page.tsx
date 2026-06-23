@@ -172,6 +172,8 @@ export default function LoginPage() {
       style={{
         backgroundImage:
           "url('/amdox-erp.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
       }}
     >
 
