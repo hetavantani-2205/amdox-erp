@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 
-import {
-  useEffect,
-} from "react";
 
-import {
-  useRouter,
-} from "next/navigation";
 
 import {
   LayoutDashboard,
@@ -22,29 +16,10 @@ import {
   LogOut,
 } from "lucide-react";
 
-import {
-  getRole,
-} from "../../utils/role";
 
 export default function SettingsPage() {
 
-  const router = useRouter();
 
-  // ROLE PROTECTION
-
-  useEffect(() => {
-
-    const role = getRole();
-
-    if (
-      role !== "SUPER_ADMIN"
-    ) {
-
-      router.push("/dashboard");
-
-    }
-
-  }, []);
 
   return (
 
