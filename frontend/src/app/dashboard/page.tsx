@@ -192,6 +192,16 @@ setRole(
 
             </Link>
 
+            <Link href="/forecast">
+
+  <div className="flex items-center gap-3 hover:bg-slate-800 p-4 rounded-2xl cursor-pointer transition">
+
+    🤖 AI Forecast
+
+  </div>
+
+</Link>
+
             {/* SETTINGS */}
 
             {(
