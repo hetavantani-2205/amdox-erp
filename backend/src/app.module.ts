@@ -14,6 +14,9 @@ import { EmployeesModule } from './employees/employees.module';
 import { EmployeeModule } from './employee/employee.module';
 import { PayrollModule } from './payroll/payroll.module';
 
+import { AuditModule }
+from './audit/audit.module';
+
 import { ProjectsModule } from './projects/projects.module';
 
 import { PrismaService } from './prisma/prisma.service';
@@ -27,6 +30,7 @@ import { PrismaService } from './prisma/prisma.service';
     PayrollModule,
     MeetingModule,
     ForecastModule,
+    AuditModule,
   ],
 
   controllers: [AppController],

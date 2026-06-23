@@ -1,147 +1,107 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-} from "react";
-
-import {
-  useRouter,
-} from "next/navigation";
-
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import Link from "next/link";
 
 export default function RegisterPage() {
-
   const router = useRouter();
 
-  const [name, setName] =
-    useState("");
-
-  const [email, setEmail] =
-    useState("");
-
-  const [password, setPassword] =
-    useState("");
-
-  const [role, setRole] =
-    useState("EMPLOYEE");
-
-  // AUTO REDIRECT
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("EMPLOYEE");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-
-    const token =
-      localStorage.getItem(
-        "token"
-      );
+    const token = localStorage.getItem("token");
 
     if (token) {
+      router.push("/dashboard");
+    }
+  }, [router]);
 
-      router.push(
-        "/dashboard"
-      );
+  const handleRegister = async () => {
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
 
+    if (!cleanName) {
+      toast.error("Full name is required 👤");
+      return;
     }
 
-  }, []);
+    if (!cleanEmail) {
+      toast.error("Email address is required 📧");
+      return;
+    }
 
-  // REGISTER
+    if (!/\S+@\S+\.\S+/.test(cleanEmail)) {
+      toast.error("Enter a valid email address 📧");
+      return;
+    }
 
-  const handleRegister =
-    async () => {
+    if (!password) {
+      toast.error("Password is required 🔒");
+      return;
+    }
 
-      // VALIDATION
+    if (password.length < 6) {
+      toast.error(
+        "Password must contain at least 6 characters 🔒"
+      );
+      return;
+    }
 
-      if (
-        !name ||
-        !email ||
-        !password
-      ) {
+    try {
+      setLoading(true);
 
-        alert(
-          "Please fill all fields"
-        );
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
+        {
+          method: "POST",
 
-        return;
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-      }
-
-      if (
-        password.length < 6
-      ) {
-
-        alert(
-          "Password must be at least 6 characters"
-        );
-
-        return;
-
-      }
-
-      try {
-
-        const response =
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-
-              body: JSON.stringify(
-                {
-                  name,
-                  email,
-                  password,
-                  role,
-                }
-              ),
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (
-          response.ok
-        ) {
-
-          alert(
-            "Registration Successful"
-          );
-
-          router.push(
-            "/login"
-          );
-
-        } else {
-
-          alert(
-            data.message ||
-            "Registration Failed"
-          );
-
+          body: JSON.stringify({
+            name: cleanName,
+            email: cleanEmail,
+            password,
+            role,
+          }),
         }
+      );
 
-      } catch (error) {
+      const data = await response.json();
 
-        console.error(
-          error
+      if (response.ok) {
+        toast.success(
+          "Registration successful 🎉"
         );
 
-        alert(
-          "Something went wrong"
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
+      } else {
+        toast.error(
+          data.message ||
+            "Registration failed ❌"
         );
-
       }
-    };
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        "Server error. Please try again later 🚨"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-
     <div
       className="
         min-h-screen
@@ -157,12 +117,11 @@ export default function RegisterPage() {
           "url('/amdox-erp.png')",
       }}
     >
-
-      {/* OVERLAY */}
+      {/* Overlay */}
 
       <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
 
-      {/* CARD */}
+      {/* Card */}
 
       <div
         className="
@@ -177,9 +136,6 @@ export default function RegisterPage() {
           p-10
         "
       >
-
-        {/* HEADING */}
-
         <h1
           className="
             text-4xl
@@ -189,21 +145,17 @@ export default function RegisterPage() {
             text-slate-900
           "
         >
-
           ERP Registration
-
         </h1>
 
-        {/* NAME */}
+        {/* Name */}
 
         <input
           type="text"
           placeholder="Full Name"
           value={name}
           onChange={(e) =>
-            setName(
-              e.target.value
-            )
+            setName(e.target.value)
           }
           className="
             w-full
@@ -218,16 +170,14 @@ export default function RegisterPage() {
           "
         />
 
-        {/* EMAIL */}
+        {/* Email */}
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Email Address"
           value={email}
           onChange={(e) =>
-            setEmail(
-              e.target.value
-            )
+            setEmail(e.target.value)
           }
           className="
             w-full
@@ -242,16 +192,14 @@ export default function RegisterPage() {
           "
         />
 
-        {/* PASSWORD */}
+        {/* Password */}
 
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) =>
-            setPassword(
-              e.target.value
-            )
+            setPassword(e.target.value)
           }
           className="
             w-full
@@ -266,14 +214,12 @@ export default function RegisterPage() {
           "
         />
 
-        {/* ROLE */}
+        {/* Role */}
 
         <select
           value={role}
           onChange={(e) =>
-            setRole(
-              e.target.value
-            )
+            setRole(e.target.value)
           }
           className="
             w-full
@@ -287,7 +233,6 @@ export default function RegisterPage() {
             focus:ring-green-500
           "
         >
-
           <option value="EMPLOYEE">
             EMPLOYEE
           </option>
@@ -303,19 +248,18 @@ export default function RegisterPage() {
           <option value="SUPER_ADMIN">
             SUPER_ADMIN
           </option>
-
         </select>
 
-        {/* BUTTON */}
+        {/* Register Button */}
 
         <button
-          onClick={
-            handleRegister
-          }
+          onClick={handleRegister}
+          disabled={loading}
           className="
             w-full
             bg-green-600
             hover:bg-green-700
+            disabled:bg-gray-400
             transition
             duration-300
             text-white
@@ -325,15 +269,14 @@ export default function RegisterPage() {
             shadow-lg
           "
         >
-
-          Register
-
+          {loading
+            ? "Registering..."
+            : "Register"}
         </button>
 
-        {/* LOGIN */}
+        {/* Login Link */}
 
         <p className="mt-6 text-center text-gray-700">
-
           Already have an account?
 
           <Link
@@ -345,16 +288,10 @@ export default function RegisterPage() {
               hover:underline
             "
           >
-
             Login
-
           </Link>
-
         </p>
-
       </div>
-
     </div>
-
   );
 }

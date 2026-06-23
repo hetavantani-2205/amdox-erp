@@ -57,7 +57,18 @@ async getPayrolls() {
 
   return this.prisma.payroll.findMany({
     include: {
-      employee: true,
+      employee: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          salary: true,
+          role: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
     },
   });
 

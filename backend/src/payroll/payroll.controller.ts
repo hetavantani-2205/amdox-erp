@@ -12,7 +12,7 @@ export class PayrollController {
     private payrollService: PayrollService,
   ) {}
 
-  @Post('generate')
+  @Get('generate')
   generatePayroll() {
     return this.payrollService.generatePayroll();
   }

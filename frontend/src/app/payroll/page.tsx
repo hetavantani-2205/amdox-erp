@@ -87,7 +87,35 @@ export default function PayrollPage() {
     }
   };
 
-  // TOTAL PAYROLL
+  // GENERATE PAYROLL
+
+const generatePayroll = async () => {
+
+  try {
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/payroll/generate`,
+      {
+        method: "POST",
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(data);
+
+    fetchPayroll();
+
+  } catch (error) {
+
+    console.log(
+      "Generate Payroll Error:",
+      error
+    );
+  }
+};
+
+
 
   const totalPayroll =
     payrolls.reduce(
@@ -279,7 +307,7 @@ export default function PayrollPage() {
           </div>
 
           <button
-            onClick={fetchPayroll}
+            onClick={generatePayroll}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-2xl shadow-lg transition"
           >
 

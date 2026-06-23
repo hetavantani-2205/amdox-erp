@@ -1,11 +1,12 @@
 import {
-  Injectable,
-  BadRequestException,
-  UnauthorizedException,
+Injectable,
+BadRequestException,
+UnauthorizedException,
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { AuditService } from '../audit/audit.service';
 
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -15,153 +16,180 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
 
-  constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-  ) {}
+constructor(
+private prisma: PrismaService,
+private jwtService: JwtService,
+private auditService: AuditService,
+) {}
 
-  
+async register(dto: RegisterDto) {
 
-  async register(dto: RegisterDto) {
+```
+const existingUser =
+  await this.prisma.user.findUnique({
+    where: {
+      email: dto.email,
+    },
+  });
 
-    
-    const existingUser =
-      await this.prisma.user.findUnique({
-        where: {
-          email: dto.email,
-        },
-      });
+if (existingUser) {
 
-    if (existingUser) {
+  throw new BadRequestException(
+    'Email already registered',
+  );
 
-      throw new BadRequestException(
-        'Email already exists',
-      );
+}
 
-    }
+const hashedPassword =
+  await bcrypt.hash(dto.password, 10);
 
-    // HASH PASSWORD
-    const hashedPassword =
-      await bcrypt.hash(dto.password, 10);
+const tenant =
+  await this.prisma.tenant.create({
+    data: {
+      name: `${dto.name} Company`,
+    },
+  });
 
-    // CREATE DEFAULT TENANT
-    const tenant =
-      await this.prisma.tenant.create({
-        data: {
-          name: `${dto.name} Company`,
-        },
-      });
+const user =
+  await this.prisma.user.create({
+    data: {
+      name: dto.name,
+      email: dto.email,
+      password: hashedPassword,
+      role: dto.role,
+      salary: 50000,
+      tenantId: tenant.id,
+    },
+  });
 
-  
+await this.auditService.log({
+  userId: user.id,
+  userName: user.name,
+  userEmail: user.email,
+  role: user.role,
+  module: 'Authentication',
+  action: 'REGISTER',
+  description:
+    'New user account created',
+});
 
-    
-    const user =
-      await this.prisma.user.create({
-        data: {
-          name: dto.name,
-          email: dto.email,
-          password: hashedPassword,
-          role: dto.role,
-          salary: 50000,
-          tenantId: tenant.id,
-        },
-      });
+return {
 
-      const basicSalary = user.salary || 0;
+  message:
+    'User registered successfully',
 
-  const hra = basicSalary * 0.2;
+  user: {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    salary: user.salary,
+  },
 
-  const bonus = 5000;
+};
+```
 
-  const deduction = basicSalary * 0.12;
+}
 
-  const netSalary =
-    basicSalary + hra + bonus - deduction;
+async login(data: LoginDto) {
 
-    return {
+```
+const user =
+  await this.prisma.user.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
 
-      message: 'User registered successfully',
+if (!user) {
 
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        salary: user.salary,
-      },
+  throw new UnauthorizedException(
+    'User not found',
+  );
 
-    };
-  }
+}
 
-  // ================= LOGIN =================
+const passwordMatch =
+  await bcrypt.compare(
+    data.password,
+    user.password,
+  );
 
-  async login(data: LoginDto) {
+if (!passwordMatch) {
 
-    const user =
-      await this.prisma.user.findUnique({
-        where: {
-          email: data.email,
-        },
-      });
+  await this.auditService.log({
+    userId: user.id,
+    userName: user.name,
+    userEmail: user.email,
+    role: user.role,
+    module: 'Authentication',
+    action: 'FAILED_LOGIN',
+    description:
+      'Invalid password entered',
+  });
 
-    // CHECK USER
-    if (!user) {
+  throw new UnauthorizedException(
+    'Invalid password',
+  );
 
-      throw new UnauthorizedException(
-        'Invalid credentials',
-      );
+}
 
-    }
+if (user.role !== data.role) {
 
-    // CHECK PASSWORD
-    const passwordMatch =
-      await bcrypt.compare(
-        data.password,
-        user.password,
-      );
+  await this.auditService.log({
+    userId: user.id,
+    userName: user.name,
+    userEmail: user.email,
+    role: user.role,
+    module: 'Authentication',
+    action: 'FAILED_LOGIN',
+    description:
+      'Incorrect role selected',
+  });
 
-    if (!passwordMatch) {
+  throw new UnauthorizedException(
+    'Selected role is incorrect',
+  );
 
-      throw new UnauthorizedException(
-        'Invalid credentials',
-      );
+}
 
-    }
+const token =
+  this.jwtService.sign({
 
-    // CHECK ROLE
-    if (user.role !== data.role) {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    tenantId: user.tenantId,
 
-      throw new UnauthorizedException(
-        'Invalid role selected',
-      );
+  });
 
-    }
+await this.auditService.log({
+  userId: user.id,
+  userName: user.name,
+  userEmail: user.email,
+  role: user.role,
+  module: 'Authentication',
+  action: 'LOGIN',
+  description:
+    'User logged in successfully',
+});
 
-    // GENERATE JWT TOKEN
-    const token =
-      this.jwtService.sign({
+return {
 
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-        tenantId: user.tenantId,
+  message: 'Login successful',
 
-      });
+  access_token: token,
 
-    return {
+  user: {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    salary: user.salary,
+  },
 
-      message: 'Login successful',
+};
+```
 
-      access_token: token,
-
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        salary: user.salary,
-      },
-
-    };
-  }
+}
 }

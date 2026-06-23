@@ -72,3 +72,27 @@ model Payroll {
 
   employee User @relation(fields: [employeeId], references: [id])
 }
+
+model AuditLog {
+  id          String   @id @default(cuid())
+
+  userId      String?
+  userName    String
+  userEmail   String
+  role        String
+
+  module      String
+  action      String
+
+  description String
+
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userEmail])
+  @@index([module])
+  @@index([action])
+}

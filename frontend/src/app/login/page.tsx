@@ -1,10 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-import { useRouter }
-from 'next/navigation';
-
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -17,6 +15,9 @@ export default function LoginPage() {
 
   const [role, setRole] =
     useState('EMPLOYEE');
+
+  const [loading, setLoading] =
+    useState(false);
 
   const router = useRouter();
 
@@ -33,13 +34,49 @@ export default function LoginPage() {
 
     }
 
-  }, []);
+  }, [router]);
 
   // LOGIN
 
   const handleLogin = async () => {
 
+    const cleanEmail =
+      email.trim().toLowerCase();
+
+    if (!cleanEmail) {
+
+      toast.error(
+        'Email address is required 📧'
+      );
+
+      return;
+    }
+
+    if (
+      !/\S+@\S+\.\S+/.test(
+        cleanEmail
+      )
+    ) {
+
+      toast.error(
+        'Enter a valid email address 📧'
+      );
+
+      return;
+    }
+
+    if (!password) {
+
+      toast.error(
+        'Password is required 🔒'
+      );
+
+      return;
+    }
+
     try {
+
+      setLoading(true);
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
@@ -52,7 +89,7 @@ export default function LoginPage() {
           },
 
           body: JSON.stringify({
-            email,
+            email: cleanEmail,
             password,
             role,
           }),
@@ -64,14 +101,10 @@ export default function LoginPage() {
 
       if (response.ok) {
 
-        // SAVE TOKEN
-
         localStorage.setItem(
           'token',
           data.access_token
         );
-
-        // SAVE ROLE
 
         localStorage.setItem(
           'role',
@@ -79,22 +112,33 @@ export default function LoginPage() {
         );
 
         localStorage.setItem(
-  'name',
-  data.user.name
-);
+          'name',
+          data.user.name
+        );
 
-localStorage.setItem(
-  'email',
-  data.user.email
-);
+        localStorage.setItem(
+          'email',
+          data.user.email
+        );
 
-        alert('Login Successful');
+        toast.success(
+          'Login successful 🚀'
+        );
 
-        router.push('/dashboard');
+        setTimeout(() => {
+
+          router.push(
+            '/dashboard'
+          );
+
+        }, 1000);
 
       } else {
 
-        alert(data.message);
+        toast.error(
+          data.message ||
+          'Invalid credentials ❌'
+        );
 
       }
 
@@ -102,7 +146,13 @@ localStorage.setItem(
 
       console.log(error);
 
-      alert('Server Error');
+      toast.error(
+        'Server error. Please try again later 🚨'
+      );
+
+    } finally {
+
+      setLoading(false);
 
     }
   };
@@ -161,10 +211,12 @@ localStorage.setItem(
 
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Email Address"
           value={email}
           onChange={(e) =>
-            setEmail(e.target.value)
+            setEmail(
+              e.target.value
+            )
           }
           className="
             w-full
@@ -172,6 +224,10 @@ localStorage.setItem(
             mb-4
             rounded-2xl
             border
+            border-gray-300
+            outline-none
+            focus:ring-2
+            focus:ring-blue-500
           "
         />
 
@@ -182,7 +238,9 @@ localStorage.setItem(
           placeholder="Password"
           value={password}
           onChange={(e) =>
-            setPassword(e.target.value)
+            setPassword(
+              e.target.value
+            )
           }
           className="
             w-full
@@ -190,6 +248,10 @@ localStorage.setItem(
             mb-4
             rounded-2xl
             border
+            border-gray-300
+            outline-none
+            focus:ring-2
+            focus:ring-blue-500
           "
         />
 
@@ -198,7 +260,9 @@ localStorage.setItem(
         <select
           value={role}
           onChange={(e) =>
-            setRole(e.target.value)
+            setRole(
+              e.target.value
+            )
           }
           className="
             w-full
@@ -206,6 +270,10 @@ localStorage.setItem(
             mb-6
             rounded-2xl
             border
+            border-gray-300
+            outline-none
+            focus:ring-2
+            focus:ring-blue-500
           "
         >
 
@@ -231,10 +299,12 @@ localStorage.setItem(
 
         <button
           onClick={handleLogin}
+          disabled={loading}
           className="
             w-full
             bg-blue-600
             hover:bg-blue-700
+            disabled:bg-gray-400
             text-white
             p-4
             rounded-2xl
@@ -243,7 +313,9 @@ localStorage.setItem(
           "
         >
 
-          Login
+          {loading
+            ? 'Logging in...'
+            : 'Login'}
 
         </button>
 
