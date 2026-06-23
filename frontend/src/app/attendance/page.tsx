@@ -23,55 +23,82 @@ import {
 import {
   getRole,
 } from "../../utils/role";
+import { email } from "zod/v4/mini";
 
 export default function AttendancePage() {
 
   const router = useRouter();
 
+  const [loading, setLoading] =
+  useState(true);
+
   const [attendance, setAttendance] =
     useState<any[]>([]);
 
-  // ROLE PROTECTION
+  const fetchAttendance = async () => {
 
-  useEffect(() => {
+  try {
 
-    const role = getRole();
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/employees`
+    );
 
-    if (!role) {
+    const users = await response.json();
 
-      router.push("/login");
+    const attendanceData = users.map(
+      (user: any, index: number) => ({
+        id: user.id,
+        name: user.name,
 
-    }
+        department:
+          user.department || "General",
 
-    // DUMMY DATA
+        status:
+          index % 4 === 0
+            ? "Absent"
+            : "Present",
 
-    setAttendance([
-      {
-        id: 1,
-        name: "Rahul Sharma",
-        department: "IT",
-        status: "Present",
-        checkIn: "09:05 AM",
-      },
-      {
-        id: 2,
-        name: "Priya Patel",
-        department: "HR",
-        status: "Absent",
-        checkIn: "--",
-      },
-      {
-        id: 3,
-        name: "Amit Shah",
-        department: "Finance",
-        status: "Present",
-        checkIn: "09:15 AM",
-      },
-    ]);
+        checkIn:
+          index % 4 === 0
+            ? "--"
+            : "09:00 AM",
+      })
+    );
 
-  }, []);
+    setAttendance(attendanceData);
 
-  // STATS
+  } catch (error) {
+
+    console.error(
+      "Attendance Fetch Error:",
+      error
+    );
+
+  }
+
+  finally {
+
+  setLoading(false);
+
+}
+
+};
+
+  
+useEffect(() => {
+
+  const role = getRole();
+
+  if (!role) {
+
+    router.push("/login");
+    return;
+
+  }
+
+  fetchAttendance();
+
+}, []);
 
   const totalPresent =
     attendance.filter(
@@ -84,6 +111,18 @@ export default function AttendancePage() {
       (item) =>
         item.status === "Absent"
     ).length;
+
+    if (loading) {
+
+  return (
+
+    <div className="p-10 text-2xl font-bold">
+      Loading Attendance...
+    </div>
+
+  );
+
+}
 
   return (
 
@@ -230,6 +269,11 @@ export default function AttendancePage() {
 
         <button
           onClick={() => {
+
+            localStorage.removeItem(
+              "name");
+           localStorage.removeItem(
+            "email");
 
             localStorage.removeItem(
               "token"
