@@ -115,6 +115,8 @@ export default function RegisterPage() {
       style={{
         backgroundImage:
           "url('/amdox-erp.png')",
+           backgroundSize: "cover",
+           backgroundPosition: "center top",
       }}
     >
       {/* Overlay */}
