@@ -1,7 +1,7 @@
 import {
-Injectable,
-BadRequestException,
-UnauthorizedException,
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,181 +15,157 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+    private auditService: AuditService,
+  ) {}
 
-constructor(
-private prisma: PrismaService,
-private jwtService: JwtService,
-private auditService: AuditService,
-) {}
+  async register(dto: RegisterDto) {
+    const existingUser =
+      await this.prisma.user.findUnique({
+        where: {
+          email: dto.email,
+        },
+      });
 
-async register(dto: RegisterDto) {
+    if (existingUser) {
+      throw new BadRequestException(
+        'Email already registered',
+      );
+    }
 
-```
-const existingUser =
-  await this.prisma.user.findUnique({
-    where: {
-      email: dto.email,
-    },
-  });
+    const hashedPassword =
+      await bcrypt.hash(dto.password, 10);
 
-if (existingUser) {
+    const tenant =
+      await this.prisma.tenant.create({
+        data: {
+          name: `${dto.name} Company`,
+        },
+      });
 
-  throw new BadRequestException(
-    'Email already registered',
-  );
+    const user =
+      await this.prisma.user.create({
+        data: {
+          name: dto.name,
+          email: dto.email,
+          password: hashedPassword,
+          role: dto.role,
+          salary: 50000,
+          tenantId: tenant.id,
+        },
+      });
 
-}
+    await this.auditService.log({
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      role: user.role,
+      module: 'Authentication',
+      action: 'REGISTER',
+      description:
+        'New user account created',
+    });
 
-const hashedPassword =
-  await bcrypt.hash(dto.password, 10);
+    return {
+      message: 'User registered successfully',
 
-const tenant =
-  await this.prisma.tenant.create({
-    data: {
-      name: `${dto.name} Company`,
-    },
-  });
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        salary: user.salary,
+      },
+    };
+  }
 
-const user =
-  await this.prisma.user.create({
-    data: {
-      name: dto.name,
-      email: dto.email,
-      password: hashedPassword,
-      role: dto.role,
-      salary: 50000,
-      tenantId: tenant.id,
-    },
-  });
+  async login(data: LoginDto) {
+    const user =
+      await this.prisma.user.findUnique({
+        where: {
+          email: data.email,
+        },
+      });
 
-await this.auditService.log({
-  userId: user.id,
-  userName: user.name,
-  userEmail: user.email,
-  role: user.role,
-  module: 'Authentication',
-  action: 'REGISTER',
-  description:
-    'New user account created',
-});
+    if (!user) {
+      throw new UnauthorizedException(
+        'User not found',
+      );
+    }
 
-return {
+    const passwordMatch =
+      await bcrypt.compare(
+        data.password,
+        user.password,
+      );
 
-  message:
-    'User registered successfully',
+    if (!passwordMatch) {
+      await this.auditService.log({
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        role: user.role,
+        module: 'Authentication',
+        action: 'FAILED_LOGIN',
+        description:
+          'Invalid password entered',
+      });
 
-  user: {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    salary: user.salary,
-  },
+      throw new UnauthorizedException(
+        'Invalid password',
+      );
+    }
 
-};
-```
+    if (user.role !== data.role) {
+      await this.auditService.log({
+        userId: user.id,
+        userName: user.name,
+        userEmail: user.email,
+        role: user.role,
+        module: 'Authentication',
+        action: 'FAILED_LOGIN',
+        description:
+          'Incorrect role selected',
+      });
 
-}
+      throw new UnauthorizedException(
+        'Selected role is incorrect',
+      );
+    }
 
-async login(data: LoginDto) {
+    const token =
+      this.jwtService.sign({
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+        tenantId: user.tenantId,
+      });
 
-```
-const user =
-  await this.prisma.user.findUnique({
-    where: {
-      email: data.email,
-    },
-  });
+    await this.auditService.log({
+      userId: user.id,
+      userName: user.name,
+      userEmail: user.email,
+      role: user.role,
+      module: 'Authentication',
+      action: 'LOGIN',
+      description:
+        'User logged in successfully',
+    });
 
-if (!user) {
+    return {
+      message: 'Login successful',
 
-  throw new UnauthorizedException(
-    'User not found',
-  );
+      access_token: token,
 
-}
-
-const passwordMatch =
-  await bcrypt.compare(
-    data.password,
-    user.password,
-  );
-
-if (!passwordMatch) {
-
-  await this.auditService.log({
-    userId: user.id,
-    userName: user.name,
-    userEmail: user.email,
-    role: user.role,
-    module: 'Authentication',
-    action: 'FAILED_LOGIN',
-    description:
-      'Invalid password entered',
-  });
-
-  throw new UnauthorizedException(
-    'Invalid password',
-  );
-
-}
-
-if (user.role !== data.role) {
-
-  await this.auditService.log({
-    userId: user.id,
-    userName: user.name,
-    userEmail: user.email,
-    role: user.role,
-    module: 'Authentication',
-    action: 'FAILED_LOGIN',
-    description:
-      'Incorrect role selected',
-  });
-
-  throw new UnauthorizedException(
-    'Selected role is incorrect',
-  );
-
-}
-
-const token =
-  this.jwtService.sign({
-
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-    tenantId: user.tenantId,
-
-  });
-
-await this.auditService.log({
-  userId: user.id,
-  userName: user.name,
-  userEmail: user.email,
-  role: user.role,
-  module: 'Authentication',
-  action: 'LOGIN',
-  description:
-    'User logged in successfully',
-});
-
-return {
-
-  message: 'Login successful',
-
-  access_token: token,
-
-  user: {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    salary: user.salary,
-  },
-
-};
-```
-
-}
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        salary: user.salary,
+      },
+    };
+  }
 }
