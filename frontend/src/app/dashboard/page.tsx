@@ -204,9 +204,7 @@ setRole(
 
             {/* SETTINGS */}
 
-            {(
-              getRole() === "SUPER_ADMIN"
-            ) && (
+           
 
               <Link href="/settings">
 
@@ -220,7 +218,7 @@ setRole(
 
               </Link>
 
-            )}
+          
 
           </div>
 
